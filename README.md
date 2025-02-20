@@ -7,6 +7,10 @@ FaceFusion
 [![Coverage Status](https://img.shields.io/coveralls/facefusion/facefusion.svg)](https://coveralls.io/r/facefusion/facefusion)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
+This Fork
+---------
+> This fork mainly allow for better encoder handling. By default, facefusion try to set the same file extension to
+> the output than the target. Now, it properly infer the extension file from the selected video encoder.
 
 Preview
 -------
