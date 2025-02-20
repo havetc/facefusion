@@ -1,3 +1,4 @@
+import logging
 import os
 from typing import List
 
@@ -11,8 +12,25 @@ def get_temp_file_path(file_path : str) -> str:
 	return os.path.join(temp_directory_path, 'temp' + temp_file_extension)
 
 
+def get_temp_file_path_with_correct_ext(file_path : str) -> str:
+	output_video_encoder = state_manager.get_item('output_video_encoder')
+	if "265" in output_video_encoder or "264" in output_video_encoder or "hevc" in output_video_encoder:
+		ext = ".mp4"
+	elif "vpx" in output_video_encoder:
+		ext = ".webm"
+	else:
+		ext = ".mp4"
+	temp_directory_path = get_temp_directory_path(file_path)
+	return os.path.join(temp_directory_path, 'temp' + ext)
+
+
 def move_temp_file(file_path : str, move_path : str) -> bool:
 	temp_file_path = get_temp_file_path(file_path)
+	return move_file(temp_file_path, move_path)
+
+
+def move_temp_file_with_correct_ext(file_path : str, move_path : str) -> bool:
+	temp_file_path = get_temp_file_path_with_correct_ext(file_path)
 	return move_file(temp_file_path, move_path)
 
 

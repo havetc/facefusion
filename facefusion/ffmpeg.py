@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 from facefusion import logger, process_manager, state_manager, wording
 from facefusion.filesystem import remove_file
-from facefusion.temp_helper import get_temp_file_path, get_temp_frame_paths, get_temp_frames_pattern
+from facefusion.temp_helper import get_temp_file_path, get_temp_frame_paths, get_temp_frames_pattern, get_temp_file_path_with_correct_ext
 from facefusion.typing import AudioBuffer, Fps, OutputVideoPreset, UpdateProgress
 from facefusion.vision import count_trim_frame_total, detect_video_duration, restrict_video_fps
 
@@ -101,12 +101,14 @@ def merge_video(target_path : str, output_video_resolution : str, output_video_f
 	output_video_preset = state_manager.get_item('output_video_preset')
 	merge_frame_total = len(get_temp_frame_paths(target_path))
 	temp_video_fps = restrict_video_fps(target_path, output_video_fps)
-	temp_file_path = get_temp_file_path(target_path)
+	temp_file_path = get_temp_file_path_with_correct_ext(target_path)
 	temp_frames_pattern = get_temp_frames_pattern(target_path, '%08d')
 	is_webm = filetype.guess_mime(target_path) == 'video/webm'
 
-	if is_webm:
-		output_video_encoder = 'libvpx-vp9'
+	_, ext = os.path.splitext(temp_file_path)
+	out_path, _ =os.path.splitext(state_manager.get_item('output_path'))
+	state_manager.set_item('output_path', out_path + ext)
+
 	commands = [ '-r', str(temp_video_fps), '-i', temp_frames_pattern, '-s', str(output_video_resolution), '-c:v', output_video_encoder ]
 	if output_video_encoder in [ 'libx264', 'libx265' ]:
 		output_video_compression = round(51 - (output_video_quality * 0.51))
@@ -178,7 +180,7 @@ def read_audio_buffer(target_path : str, sample_rate : int, channel_total : int)
 
 def restore_audio(target_path : str, output_path : str, output_video_fps : Fps, trim_frame_start : int, trim_frame_end : int) -> bool:
 	output_audio_encoder = state_manager.get_item('output_audio_encoder')
-	temp_file_path = get_temp_file_path(target_path)
+	temp_file_path = get_temp_file_path_with_correct_ext(target_path)
 	temp_video_duration = detect_video_duration(temp_file_path)
 	commands = [ '-i', temp_file_path ]
 

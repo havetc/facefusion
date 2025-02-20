@@ -1,4 +1,6 @@
 from time import sleep
+import os
+import pathlib
 from typing import Optional, Tuple
 
 import gradio
@@ -81,6 +83,9 @@ def run() -> Tuple[gradio.Button, gradio.Button, gradio.Image, gradio.Video]:
 	if job_manager.init_jobs(state_manager.get_item('jobs_path')):
 		create_and_run_job(step_args)
 		state_manager.set_item('output_path', output_path)
+		suggested_path, ext = os.path.splitext(step_args.get('output_path'))
+		filename_with_correct_extension = [f for f in pathlib.Path(os.path.dirname(suggested_path)).glob(f"{os.path.basename(suggested_path)}*")][0]
+		step_args['output_path'] = filename_with_correct_extension
 	if is_image(step_args.get('output_path')):
 		return gradio.Button(visible = True), gradio.Button(visible = False), gradio.Image(value = step_args.get('output_path'), visible = True), gradio.Video(value = None, visible = False)
 	if is_video(step_args.get('output_path')):

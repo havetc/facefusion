@@ -1,3 +1,4 @@
+import time
 from typing import Optional, Tuple
 
 import gradio
@@ -47,6 +48,7 @@ def render() -> None:
 		target_image_options['value'] = TARGET_FILE.value.get('path')
 		target_image_options['visible'] = True
 	if is_target_video:
+		target_video_options['format'] = None
 		if get_file_size(state_manager.get_item('target_path')) > FILE_SIZE_LIMIT:
 			preview_vision_frame = normalize_frame_color(get_video_frame(state_manager.get_item('target_path')))
 			target_image_options['value'] = preview_vision_frame
@@ -67,6 +69,7 @@ def listen() -> None:
 def update(file : File) -> Tuple[gradio.Image, gradio.Video]:
 	clear_reference_faces()
 	clear_static_faces()
+	time.sleep(0.5)
 	if file and is_image(file.name):
 		state_manager.set_item('target_path', file.name)
 		return gradio.Image(value = file.name, visible = True), gradio.Video(value = None, visible = False)

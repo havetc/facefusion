@@ -24,7 +24,7 @@ from facefusion.processors.core import get_processors_modules
 from facefusion.program import create_program
 from facefusion.program_helper import validate_args
 from facefusion.statistics import conditional_log_statistics
-from facefusion.temp_helper import clear_temp_directory, create_temp_directory, get_temp_file_path, get_temp_frame_paths, move_temp_file
+from facefusion.temp_helper import clear_temp_directory, create_temp_directory, get_temp_file_path, get_temp_frame_paths, move_temp_file, move_temp_file_with_correct_ext
 from facefusion.typing import Args, ErrorCode
 from facefusion.vision import get_video_frame, pack_resolution, read_image, read_static_images, restrict_image_resolution, restrict_trim_frame, restrict_video_fps, restrict_video_resolution, unpack_resolution
 
@@ -439,7 +439,7 @@ def process_video(start_time : float) -> ErrorCode:
 	# handle audio
 	if state_manager.get_item('skip_audio'):
 		logger.info(wording.get('skipping_audio'), __name__)
-		move_temp_file(state_manager.get_item('target_path'), state_manager.get_item('output_path'))
+		move_temp_file_with_correct_ext(state_manager.get_item('target_path'), state_manager.get_item('output_path'))
 	else:
 		source_audio_path = get_first(filter_audio_paths(state_manager.get_item('source_paths')))
 		if source_audio_path:
@@ -450,7 +450,7 @@ def process_video(start_time : float) -> ErrorCode:
 					process_manager.end()
 					return 4
 				logger.warn(wording.get('replacing_audio_skipped'), __name__)
-				move_temp_file(state_manager.get_item('target_path'), state_manager.get_item('output_path'))
+				move_temp_file_with_correct_ext(state_manager.get_item('target_path'), state_manager.get_item('output_path'))
 		else:
 			if restore_audio(state_manager.get_item('target_path'), state_manager.get_item('output_path'), state_manager.get_item('output_video_fps'), trim_frame_start, trim_frame_end):
 				logger.debug(wording.get('restoring_audio_succeed'), __name__)
@@ -459,7 +459,7 @@ def process_video(start_time : float) -> ErrorCode:
 					process_manager.end()
 					return 4
 				logger.warn(wording.get('restoring_audio_skipped'), __name__)
-				move_temp_file(state_manager.get_item('target_path'), state_manager.get_item('output_path'))
+				move_temp_file_with_correct_ext(state_manager.get_item('target_path'), state_manager.get_item('output_path'))
 	# clear temp
 	logger.debug(wording.get('clearing_temp'), __name__)
 	clear_temp_directory(state_manager.get_item('target_path'))
